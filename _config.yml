@@ -18,16 +18,17 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-theme: jekyll-theme-hacker
+#remote_theme: pages-themes/hacker@v0.2.0
+remote-theme: minima@v2.5.1
 email: john.t.hoffoss@gmail.com
 title: Hoff's Home
 description: >-
   Ramblings, musings, collection of crap from other places, perhaps.
 lsi: false
 safe: true
-source: /
+source: .
 domain: "jth0.github.io"
-baseurl: "/" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jth0.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jth
 github_username:  jth0
@@ -38,13 +39,14 @@ gist:
 kramdown:
   math_engine: mathjax
   syntax_highlighter: rouge
-site:
-  show_downloads: false
-  show_github_url: false
+show_downloads: false
+show_github_url: false
 plugins:
   - jekyll-feed
   - jekyll-titles-from-headings
-
+collections:
+  posts:
+    output: true
 
 # Exclude from processing.
 # The following items will not be processed, by default.
