@@ -1,1 +1,2 @@
-# jth.github.io
+# Welcome
+This is a site. Marvel at its beauty.
