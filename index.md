@@ -3,6 +3,8 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+title: Hooome
 ---
-# Welcome
-This is a site. Marvel at its beauty.
+## Get some stuff.
+- How you doin?
+- meh.

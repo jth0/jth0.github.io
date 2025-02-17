@@ -18,21 +18,24 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-#remote_theme: pages-themes/hacker@v0.2.0
-remote-theme: minima@v2.5.1
+title: My Awesome Site
 email: john.t.hoffoss@gmail.com
-title: Hoff's Home
-description: >-
-  Ramblings, musings, collection of crap from other places, perhaps.
-lsi: false
-safe: true
-source: .
+description: >- # this means to ignore newlines until "baseurl:"
+  This is my awesome site.
+  It's pretty awesome.
 domain: "jth0.github.io"
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jth0.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jth
 github_username:  jth0
-incremental: false
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-titles-from-headings
+  - jekyll-remote-theme
+  - jekyll-seo-tag
 highlighter: rouge
 gist:
   noscript: false
@@ -41,12 +44,46 @@ kramdown:
   syntax_highlighter: rouge
 show_downloads: false
 show_github_url: false
-plugins:
-  - jekyll-feed
-  - jekyll-titles-from-headings
-collections:
-  posts:
-    output: true
+
+header_pages:
+  - index.md
+  - about.md
+
+# Minima specific settings, which are only available from Minima 3.0 onward.
+minima:
+  # Minima skin selection.
+  # Available skins are:
+  # classic	           Default, light color scheme.
+  # dark	             Dark variant of the classic skin.
+  # auto	             Adaptive skin based on the default classic and dark skins.
+  # solarized-light	   Light variant of solarized color scheme.
+  # solarized-dark	   Dark variant of solarized color scheme.
+  # solarized	         Adaptive skin for solarized color scheme skins.
+  skin: dark
+
+  # Set to `true` to show excerpts on the homepage.
+  #show_excerpts: false
+
+  # Minima date format.
+  # The default value is "%b %d, %Y" (e.g. Nov 14, 2023) 
+  # Refer to https://shopify.github.io/liquid/filters/date/ if you want to customize this.
+  date_format: "%Y-%m-%d"
+
+  # Social Media Links
+  # Renders icons via Font Awesome Free webfonts CDN, based on ordered list of entries.
+  #
+  # Entry keys:
+  # * title    Tooltip rendered on hovering over icon.
+  # * icon     Font Awesome icon id. `github` corresponds to `fa-github`.
+  # * url      Full URL of social profile.
+  social_links:
+    - title: gh
+      icon: github
+      url: "https://github.com/jth0"
+    - title: twtr
+      icon: twitter
+      url: "https://x.com/jth"
+
 
 # Exclude from processing.
 # The following items will not be processed, by default.
