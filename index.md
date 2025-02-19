@@ -4,7 +4,10 @@
 
 layout: home
 title: Hooome
+author: John Hoffoss
+paginate:
+  enabled: false
 ---
-## Get some stuff.
-- How you doin?
-- meh.
+## Woot
+- Some stuff goes on
+- Some stuff ends

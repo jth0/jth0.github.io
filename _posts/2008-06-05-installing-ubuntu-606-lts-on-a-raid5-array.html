@@ -1,0 +1,218 @@
+---
+layout: post
+title: Installing Ubuntu 6.06 LTS on a RAID5 Array
+date: '2008-06-05T20:01:00-05:00'
+tags: []
+tumblr_url: https://synapsecollapse.tumblr.com/post/37338138
+---
+<p><strong>Note:</strong> <em>I did this a long time ago, way back in 2006. I am going to attempt to 8.04 LTS. I hope it works.</em></p>
+
+<h3>HOW TO INSTALL UBUNTU ON A RAID ARRAY</h3>
+
+<p>I had an old system. I wanted to set up a personal file server using a RAID5 array. I was going to use Ubuntu. I had an on-board parallel IDE controller and an extra PCI IDE controller. Now I just had to figure out how.  My disclaimer: This is not exactly step-by-step what I went through, so you would be wise to  do some quick searching yourself after reading this to see if I missed anything.</p>
+
+<h3>BOOTING ON RAID ARRAYS</h3>
+
+<p>Grub will not pick up or see a RAID5 array, which I did not clearly find up-front. This made later parts of system installation (like booting) difficult. The way this works, from what I understand, is that grub is not smart enough to piece together the slices from a RAID5 array. It can, however, deal with RAID1. Which makes sense, because RAID1 is a mirror of a drive. It may even be able to deal with RAID0 striped arrays, but we&rsquo;re talking about a <code>/boot</code> partition here, so who cares about striping for performance.</p>
+
+<p>So something I said there was key, a <code>/boot</code> partition. I didn&rsquo;t do that on my first run through installing and setup, which necessitated more juggling and system reorganization than I outline in this document.</p>
+
+<p>So here is the system layout I wanted to end up with:</p>
+
+<pre><code>/dev/md0       /boot
+/dev/md1       /
+/dev/md2       swap
+/dev/md3       /home
+/dev/md4       /tmp
+/dev/md5       /usr
+</code></pre>
+
+<p>I wound up creating an array for my swap space. From what I&rsquo;ve read, this is not necessary, as I could simply have added this:</p>
+
+<pre><code>/dev/hda3       swap
+/dev/hde3       swap
+/dev/hdg3       swap
+</code></pre>
+
+<p>and the system would have properly dealt with and balanced across those partitions. But I like doing things a little different. So I RAIDed it.</p>
+
+<p>The rest of the document should be modified if you&rsquo;re using a different scheme. Each <code>md?</code> device corresponds to the partition on the IDE disks, so <code>/dev/md2</code> on my system corresponds to <code>/dev/hda3</code>, <code>/dev/hde3</code>, and <code>/dev/hdg3</code>. This does not need to work this way, as you&rsquo;ll see below, but doing this consistently will make configuration much easier.</p>
+
+<p>So on to the fun stuff. The first task was getting the @(#*%&amp; system to boot so I could see the PCI IDE controller in my system. I wound up using the Ubuntu &lsquo;Live&rsquo; CD. Which doesn&rsquo;t have the nice, auto-RAID-type 'server&rsquo; installer on it. Because the server install CD doesn&rsquo;t see my IDE controller. If the server CD lets you at your drives, you might want to just use that. But these instructions should work for Gentoo, Slackware, or any other Linux distribution too.</p>
+
+<p>So, boot up and partition your nice, new drives, as outlined below.</p>
+
+<pre><code>$ fdisk /dev/hda
+$ fdisk -d /dev/hda | fdisk -i -r /dev/hde
+$ fdisk -d /dev/hda | fdisk -i -r /dev/hdg
+</code></pre>
+
+<p>Those second two commands are supposed to dump the partition table of <code>hda</code> and write them into <code>hde</code> and <code>hdg</code>. Not all versions of <code>fdisk</code> support this, including the one in Ubuntu, so this is not what I actually did. But it looks cool, and maybe it&rsquo;ll work for you!</p>
+
+<p>When doing this manually, remember to configure each disk exactly the same for simplicity&rsquo;s sake. If you know what you&rsquo;re doing though, then have fun.</p>
+
+<h3>PARTITION TABLE - HDA</h3>
+
+<pre><code>Disk /dev/hda: 80.0 GB, 80026361856 bytes
+255 heads, 63 sectors/track, 9729 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Device Boot      Start         End      Blocks   Id  System
+/dev/hda1   *           1          12       96358+  83  Linux 
+/dev/hda2              13         438     3421845   fd  Linux raid autodetect
+/dev/hda3             439         560      979965   82  Linux swap / Solaris
+/dev/hda4             561        9729    73649992+   5  Extended
+/dev/hda5             561         852     2345458+  fd  Linux raid autodetect
+/dev/hda6             853         974      979933+  fd  Linux raid autodetect
+/dev/hda7             975        9729    70324506   fd  Linux raid autodetect
+</code></pre>
+
+<h3>PARTITION TABLE - HDE</h3>
+
+<pre><code>Disk /dev/hde: 80.0 GB, 80026361856 bytes
+255 heads, 63 sectors/track, 9729 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Device Boot      Start         End      Blocks   Id  System
+/dev/hde1   *           1          12       96358+  83  Linux
+/dev/hde2              13         438     3421845   fd  Linux raid autodetect 
+/dev/hde3             439         560      979965   82  Linux swap / Solaris
+/dev/hde4             561        9729    73649992+   5  Extended
+/dev/hde5             561         852     2345458+  fd  Linux raid autodetect
+/dev/hde6             853         974      979933+  fd  Linux raid autodetect
+/dev/hde7             975        9729    70324506   fd  Linux raid autodetect
+</code></pre>
+
+<h3>PARTITION TABLE - HDG</h3>
+
+<pre><code>Disk /dev/hdg: 80.0 GB, 80026361856 bytes
+255 heads, 63 sectors/track, 9729 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Device Boot      Start         End      Blocks   Id  System
+/dev/hdg1   *           1          12       96358+  83  Linux
+/dev/hdg2              13         438     3421845   fd  Linux raid autodetect 
+/dev/hdg3             439         560      979965   82  Linux swap / Solaris
+/dev/hdg4             561        9729    73649992+   5  Extended
+/dev/hdg5             561         852     2345458+  fd  Linux raid autodetect
+/dev/hdg6             853         974      979933+  fd  Linux raid autodetect
+/dev/hdg7             975        9729    70324506   fd  Linux raid autodetect
+</code></pre>
+
+<h3>ARRAY INITIALIZATION</h3>
+
+<p>Now that our disks are all partitioned nice, lets get right into and create some arrays!</p>
+
+<pre><code>$ sudo mdadm --create --verbose /dev/md0 --level=1 --raid-devices=3 /dev/hda1 /dev/hde1 /dev/hdg1
+$ sudo mdadm --create --verbose /dev/md1 --level=5 --raid-devices=3 /dev/hda2 /dev/hde2 /dev/hdg2
+$ sudo mdadm --create --verbose /dev/md2 --level=5 --raid-devices=3 /dev/hda3 /dev/hde3 /dev/hdg3
+$ sudo mdadm --create --verbose /dev/md3 --level=5 --raid-devices=3 /dev/hda5 /dev/hde5 /dev/hdg5
+$ sudo mdadm --create --verbose /dev/md4 --level=5 --raid-devices=3 /dev/hda6 /dev/hde6 /dev/hdg6
+$ sudo mdadm --create --verbose /dev/md5 --level=5 --raid-devices=3 /dev/hda7 /dev/hde7 /dev/hdg7
+</code></pre>
+
+<h3>ARRAY INFORMATION</h3>
+
+<p>We need to build a configuration file so our arrays will rebuild and remount on their own. We do this by starting with information from <code>mdadm</code> and add some additional information before placing in <code>/etc/mdadm/mdadm.conf</code>.</p>
+
+<pre><code>$ sudo mdadm --detail --scan
+&gt; ARRAY /dev/md5 level=raid5 num-devices=3 UUID=b47020f2:fda68f4a:300283c 4:40405416
+&gt; ARRAY /dev/md4 level=raid5 num-devices=3 UUID=49b4a6cc:f012a888:5804c28 c:aad937f9
+&gt; ARRAY /dev/md3 level=raid5 num-devices=3 UUID=076e8440:9701f3cc:dc09635 1:10eccc36
+&gt; ARRAY /dev/md2 level=raid5 num-devices=3 UUID=74ad64b7:045e9cb7:f55f364 a:a7e2ca36
+&gt; ARRAY /dev/md1 level=raid5 num-devices=3 UUID=8f70edc2:fe14676f:784a4da 7:b8e7c523
+&gt; ARRAY /dev/md0 level=raid1 num-devices=3 UUID=8014ed65:159cc59c:4c80ccc 2:27b9b022
+</code></pre>
+
+<p>Now that we have this, we need to tell <code>mdadm</code> what devices we are using, and what devices to associate with each array device. This is as much for our own backup information as it is for <code>mdadm</code>. So take the output above and format it like so:</p>
+
+<pre><code>$ cat /etc/mdadm/mdadm.conf
+&gt; DEVICE /dev/hda* /dev/hde* /dev/hdg*
+&gt; MAILADDR  root@localhost
+&gt; ARRAY /dev/md0 level=raid1 num-devices=3 UUID=8014ed65:159cc59c:4c80ccc 2:27b9b022 devices=/dev/hda1,/dev/hde1,/dev/hdg1 auto=md
+&gt; ARRAY /dev/md1 level=raid5 num-devices=3 UUID=8f70edc2:fe14676f:784a4da 7:b8e7c523 devices=/dev/hda2,/dev/hde2,/dev/hdg2 auto=md
+&gt; ARRAY /dev/md2 level=raid5 num-devices=3 UUID=74ad64b7:045e9cb7:f55f364 a:a7e2ca36 devices=/dev/hda3,/dev/hde3,/dev/hdg3 auto=md 
+&gt; ARRAY /dev/md3 level=raid5 num-devices=3 UUID=076e8440:9701f3cc:dc09635 1:10eccc36 devices=/dev/hda5,/dev/hde5,/dev/hdg5 auto=md 
+&gt; ARRAY /dev/md4 level=raid5 num-devices=3 UUID=49b4a6cc:f012a888:5804c28 c:aad937f9 devices=/dev/hda6,/dev/hde6,/dev/hdg6 auto=md
+&gt; ARRAY /dev/md5 level=raid5 num-devices=3 UUID=b47020f2:fda68f4a:300283c 4:40405416 devices=/dev/hda7,/dev/hde7,/dev/hdg7 auto=md
+</code></pre>
+
+<h3>FILE SYSTEM LAYOUT</h3>
+
+<p>Here is our file system layout that I&rsquo;m using these five arrays for.</p>
+
+<pre><code># /etc/fstab: static file system information.
+#
+# &lt;file system&gt; &lt;mount point&gt;   &lt;type&gt;      &lt;options&gt;       &lt;dump&gt;  &lt;pass&gt; 
+proc            /proc           proc        defaults        0       0
+/dev/md1        /               reiserfs    defaults,notail 0       1
+/dev/md0        /boot           reiserfs    defaults,notail 1       1
+/dev/md3        /home           reiserfs    defaults,notail 1       1 
+/dev/md4        /tmp            reiserfs    defaults,notail 1       1
+/dev/md5        /usr            reiserfs    defaults,notail 1       1
+/dev/md2        none            swap        sw              0       0
+/dev/hdd        /media/cdrom0   udf,iso9660 user,noauto     0       0
+</code></pre>
+
+<h3>SYSTEM INSTALLATION</h3>
+
+<p>Now we need to install our Ubuntu system to a normal drive that the n3wb  installer will let us see. But first we must have a drive or partition to use. Luckily, we have lots of disks that we&rsquo;re RAIDing away with, but no data to worry about yet. So we must simply remove partitions <code>hda1</code>, <code>hda2</code> and <code>hda3</code> from our already created and running arrays. We could also stop the arrays altogether  and use <code>hda</code>while stopped, but this allows us to see first-hand how <code>mdadm</code> works by faulting (marking as bad) and removing a drive from an array.</p>
+
+<pre><code>$ mdadm manage /dev/md0 -f /dev/hda1
+$ mdadm manage /dev/md1 -f /dev/hda2
+$ mdadm manage /dev/md2 -f /dev/hda3
+$ mkfs.reiserfs /dev/hda1
+$ mkfs.reiserfs /dev/hda2
+</code></pre>
+
+<p>Now install Ubuntu, choosing to mount <code>/dev/hda1</code> as <code>/boot</code>, <code>/dev/hda2</code> as <code>/</code> [root], and <code>/dev/hda3</code> as swap. Once complete, choose to continue using the LiveCD environment and reboot later.</p>
+
+<pre><code>$ mkdir /newsys
+$ mount /dev/hda2 /newsys
+$ mount /dev/hda1 /newsys/boot
+$ mkdir /mnt/md5
+$ mount /dev/md5 /mnt/md5
+$ tar cvpsf /mnt/md5/newsys.tar /newsys
+$ umount /mnt/md5
+$ umount /dev/hda[12]
+$ swapoff /dev/hda3
+
+$ mdadm manage /dev/md0 -a /dev/hda1
+$ mdadm manage /dev/md1 -a /dev/hda2
+$ mdadm manage /dev/md2 -a /dev/hda3
+
+$ mount /dev/md1 /newsys
+$ mkdir /newsys/boot /newsys/home /newsys/usr /newsys/tmp
+$ mount /dev/md0 /newsys/boot
+$ mount /dev/md3 /newsys/home
+$ mount /dev/md4 /newsys/tmp
+$ mount /dev/md5 /newsys/usr
+
+$ tar xvpsf /newsys/usr/newsys.tar
+</code></pre>
+
+<h3>GRUB CONFIGURATION</h3>
+
+<p>Configure grub for each boot partition.</p>
+
+<p><strong>Note:</strong> <em>This was really funky and I had to reboot a few times before I finally got this to work. I tried this with each drive in <code>/dev/md*</code> arrays, tried again on each drive while removed from the array, then recombined. It was goofy on how it rebuilt, IIRC. Just keep trying if it doesn&rsquo;t work the first time.</em></p>
+
+<pre><code>$ grub
+grub&gt; device (hd0)
+grub&gt; root (hd0,0)
+grub&gt; setup (hd0)
+grub&gt; device (hd1)
+grub&gt; root (hd1,0)
+grub&gt; setup (hd1)
+grub&gt; device (hd2)
+grub&gt; root (hd2,0)
+grub&gt; setup (hd2)
+</code></pre>
+
+<h3>REFERENCES</h3>
+
+<p><a href="https://users.piuha.net/martti/comp/ubuntu/raid.html">https://users.piuha.net/martti/comp/ubuntu/raid.html</a>
+<a href="https://www.tldp.org/HOWTO/Software-RAID-HOWTO-7.html#ss7.2">https://www.tldp.org/HOWTO/Software-RAID-HOWTO-7.html#ss7.2</a>
+<a href="https://fedoranews.org/blog/?p=688">https://fedoranews.org/blog/?p=688</a>
+<a href="https://gentoo-wiki.co/Talk:HOWTO_Gentoo_Install_on_Software_RAID">https://gentoo-wiki.co/Talk:HOWTO_Gentoo_Install_on_Software_RAID</a>
+<a href="https://www.texsoft.it/index.php?c=hardware&amp;m=hw.storage.grubraid1&amp;l=it">https://www.texsoft.it/index.php?c=hardware&amp;m=hw.storage.grubraid1&amp;l=it</a></p>

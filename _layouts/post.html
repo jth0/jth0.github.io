@@ -1,7 +1,7 @@
 ---
 layout: base
 ---
-<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+<article class="post h-entry" itemscope itemtype="https://schema.org/BlogPosting">
 
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
@@ -17,10 +17,12 @@ layout: base
           {{ mdate | date: date_format }}
         </time>
       {%- endif -%}
+      
       {%- if page.author -%}
-        • {% for author in page.author %}
-          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-            <span class="p-author h-card" itemprop="name">{{ author }}</span></span>
+        {% for name in page.author %}
+          {% assign author = site.authors | where: 'short_name', name | first %}
+          <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+            <span class="p-author h-card" itemprop="name"><a href="{{ author.url }}">{{ author.name }}</a></span></span>
             {%- if forloop.last == false %}, {% endif -%}
         {% endfor %}
       {%- endif -%}</p>
