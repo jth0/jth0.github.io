@@ -15,7 +15,7 @@ source "https://rubygems.org"
 gem "github-pages", group: :jekyll_plugins
 # If you have any plugins, put them here!
 group :jekyll_plugins do
-  gem "jekyll-feed", "~> 0.17"
+#s  gem "jekyll-feed", "~> 0.17"
   gem "jekyll-remote-theme", "~> 0.4.3"
   gem "jekyll-sass-converter", "~> 1.5.2"
   gem "jekyll-titles-from-headings", "~> 0.5.3"
@@ -23,8 +23,15 @@ group :jekyll_plugins do
   gem "jekyll-sitemap", "~> 1.4.0"
   gem "jekyll-gist", "~> 1.5.0"
   gem "nokogiri", "~> 1.18.3"
+  gem "jekyll-avatar"
+  gem "jekyll-mentions"
+  gem "jekyll-redirect-from"
+  gem "jekyll-seo-tag"
 end
 
+gem 'classifier-reborn'
+gem "numo-narray"
+gem "numo-linalg"
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
 # and associated library.
 platforms :mingw, :x64_mingw, :mswin, :jruby do

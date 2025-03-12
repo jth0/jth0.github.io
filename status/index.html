@@ -1,0 +1,18 @@
+---
+layout: home
+title: status
+pagination:
+  enabled: true
+  collection: statuses
+  per_page: 50
+---
+
+<h2>Most favorited</h2>
+
+{% assign statuses = site.statuses | sort: "favorite_count" | reverse %}
+{% include status-list.html statuses=statuses %}
+
+<h2>Most retweeted</h2>
+
+{% assign statuses = site.statuses | sort: "retweet_count" | reverse %}
+{% include status-list.html statuses=statuses %}

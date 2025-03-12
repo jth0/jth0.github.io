@@ -68,7 +68,7 @@ encoding: utf-8
 # Build settings
 theme: minima
 plugins:
-  - jekyll-feed
+#  - jekyll-feed
   - jekyll-titles-from-headings
   - jekyll-remote-theme
   - jekyll-seo-tag
@@ -77,6 +77,7 @@ plugins:
   - jekyll-gist
   - jemoji
   - jekyll-include-cache
+  - jekyll-avatar
 markdown: kramdown
 kramdown:
   math_engine: mathjax
@@ -100,10 +101,15 @@ show_date: true
 show_downloads: false
 show_github_url: false
 
+collections:
+  statuses:
+    output: true
+permalink: pretty
 header_pages:
   - index.md
   - about.md
   - blog/index.html
+  - status/index.html
 
 defaults:
   # _posts
@@ -112,7 +118,6 @@ defaults:
       type: posts
     values:
       layout: post
-      author_profile: true
       read_time: true
       comments: true
       share: true
@@ -123,12 +128,29 @@ defaults:
       type: pages
     values:
       layout: base
-      author_profile: true
   - scope:
       path: "assets/images"
+      type: images
     values:
       image: true
+  - scope:
+      path: "_statuses"
+      type: statuses
+    values:
+      layout: status
+      archived: true
 
+#feed:
+#  collections:
+#    statuses:
+#      path: "statuses.xml"
+      
+nav_pages:
+  - index.md
+  - about.md
+  - blog/index.html
+  - statuses/index.html
+  
 category_archive:
   type: liquid
   path: /categories/
